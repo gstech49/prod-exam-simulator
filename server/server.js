@@ -3,12 +3,14 @@ import morgan from 'morgan'
 import cors from 'cors'
 import {config} from 'dotenv'
 import router from './router/route.js'
+import path from 'path'
+import { fileURLToPath } from 'url'; // Import for __dirname alternative
 
 /* import connection file */
 import connect from './database/conn.js'
 
 const app = express()
-const path = require('path')
+
 
 /*app middlewares */
 app.use(morgan('tiny'))
@@ -20,7 +22,10 @@ config()
 const port = process.env.PORT || 8080
 
 /*static files */
-app.use(express.static(path.join(__dirname, '../client/build')))
+// Static files (using fileURLToPath for ES modules)
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+app.use(express.static(path.join(__dirname, '../client/build')));
 
 /*routes */
 app.use('/api', router)  /*apis */
@@ -29,14 +34,7 @@ app.get('*', function(req,res){
    res.sendFile(path.join(__dirname, '../client/build/index.html'))
 })
 
-// app.get('/', (req,res)=>{
-//     try{
-//       res.json('Get Request')
 
-//     }catch(error){
-//         res.json(error)ple
-//     }
-// })
 
 /* start server only when we have valid connection */
 
@@ -55,3 +53,4 @@ console.log('Cannot connect to the server')
 }).catch(error => {
     console.log('Invalid Database Connection')
 })
+
